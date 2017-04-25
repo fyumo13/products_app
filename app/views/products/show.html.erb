@@ -1,0 +1,39 @@
+<div class="container">
+  <div class="page-header">
+    <h2><%= @product.name %></h2>
+  </div>
+  <div class="container">
+    <p>Price: <%= @product.price %></p>
+    <p>Description: <%= @product.description %></p>
+    <p>Sold by: <%= @product.user.first_name %> <%= @product.user.last_name %></p>
+    <% if !@user.products.include?(@product) %>
+      <form action="/purchases" method="post">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        <input type="hidden" name="product" value="<%= @product.id %>">
+        <button type="submit" class="btn btn-default">Buy</button>
+      </form>
+    <% end %>
+  </div>
+  <div class="container">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+      <h4>Discussion about this product:</h4>
+      </div>
+      <% if @comments %>
+      <div class="panel-body">
+        <ul class="list-group">
+          <% @comments.each do |comment| %>
+            <li class="list-group-item"><%= comment.user.first_name %> says: <%= comment.content %></li>
+          <% end %>
+        </ul>
+      </div>
+      <% end %>
+    </div>
+    <h4>Add Comment</h4>
+    <form class="form" action="/comments/<%= @product.id %>" method="post">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      <textarea name="content" rows="8" cols="80"></textarea>
+      <button type="submit" class="btn btn-default">Submit Comment</button>
+    </form>
+  </div>
+</div>

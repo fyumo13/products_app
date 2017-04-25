@@ -1,0 +1,105 @@
+<div class="container">
+  <div class="page-header">
+    <h2>Welcome, <%= @user.first_name %></h2>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <h4>Products List</h4>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <% if @products %>
+            <tbody>
+              <% @products.each do |product| %>
+                <tr>
+                  <td><a href="/products/<%= product.id %>"><%= product.name %></a></td>
+                  <td><%= product.description %></td>
+                  <td><%= product.price %></td>
+                  <td>
+                    <% if !product.users.include?(current_user) %>
+                      <form action="/purchases" method="post">
+                        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+                        <input type="hidden" name="product" value="<%= product.id %>">
+                        <button type="submit" class="btn btn-default">Buy</button>
+                      </form>
+                    <% else %>
+                      <form action="/purchases/<%= Purchase.where(user: current_user, product: product).first.id %>" method="post">
+                        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+                        <input type="hidden" name="_method" value="delete">
+                        <button type="submit" class="btn btn-default">Cancel Purchase</button>
+                      </form>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          <% end %>
+        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <h4>My Listings</h4>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <% if @my_listings %>
+          <tbody>
+            <% @my_listings.each do |my_listing| %>
+              <tr>
+                <td><a href="/products/<%= my_listing.id %>"><%= my_listing.name %></a></td>
+                <td>
+                  <a href="/products/<%= my_listing.id %>/edit" class="btn btn-default" role="button">Edit</a>
+                  <a href="/products/<%= my_listing.id %>" data-method="delete" class="btn btn-default" role="button">Delete</a>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="page-header">
+      <h4>Add a Product</h4>
+    </div>
+    <form class="form-horizontal" action="/products" method="post">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Product Name</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" name="product[name]">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Description</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" name="product[description]" rows="8" cols="80"></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">Price</label>
+        <div class="col-sm-10">
+          <input type="decimal" class="form-control" name="product[price]">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button type="submit" class="btn btn-default">Add Product</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
